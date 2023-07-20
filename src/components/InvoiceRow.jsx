@@ -14,7 +14,7 @@ export default function InvoiceRow(props) {
   return (
     <>
     {edit? 
-      <tr>
+      <tr onKeyDown={(e) => e.key === "Enter"? handleUpdate(e): null}>
         <td><button onClick={() => setEdit(false)}>X</button></td>
         <td><button onClick={handleUpdate}>save</button></td>
         <td><input type="text" value={update.description} onChange={e => setUpdate({...update, description: e.target.value})}/></td>

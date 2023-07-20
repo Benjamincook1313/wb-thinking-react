@@ -1,44 +1,47 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import InvoiceTable from './components/InvoiceTable'
+import axios from 'axios';
 
 
 function App() {
 
-  const [testData, setTestData] = useState([
-    { id: 0, description: 'Content plan', rate: 50, hours: 4 },
-    { id: 1, description: 'Copy writing', rate: 50, hours: 2 },
-    { id: 2, description: 'Website design', rate: 50, hours: 5 },
-    { id: 3, description: 'Website development', rate: 100, hours: 5 },
-  ]);
+  const [testData, setTestData] = useState([]);
+  const [loaded, setLoaded] = useState(false);
 
   const notification = (message) => {
-    alert(message)
+    alert(message);
+  };
+
+  const getInvoices = async () => {
+    const res = await axios.get('/invoices').catch(err => console.log(err));
+    setTestData(res.data);
+    setLoaded(true);
   }
 
-  const updateData = (node) => {
-    const data = [...testData];
-    const idx = data.findIndex(obj => obj.id === node.id);
-    data[idx] = node;
-    setTestData(data);
-    notification("Update success!");
+  const updateData = async (node) => {
+    await axios.put(`/invoice/${node.id}`, node).catch(err => {
+      console.log(err);
+    });
+
+    setLoaded(false);
   };
 
-  const deleteData = (id) => {
-    const data = [...testData]
-    const idx = testData.findIndex(obj => obj.id === id);
-    data.splice(idx, 1);
-    setTestData(data);
-    notification("Delete success!");
+  const deleteData = async (id) => {
+    await axios.delete(`/invoice/${id}`).catch(err => {
+      console.log(err)
+    });
+    setLoaded(false);
   };
 
-  const addData = (node) => {
-    let newId = testData[testData.length -1].id++;
-    const data = [...testData];
-    data.push({id: newId, ...node});
-    setTestData(data);
-    notification("Data successfully added!");
+  const addData = async (node) => {
+    await axios.post('/invoice', node).catch(err => console.log(err));
+    setLoaded(false);
   };
+
+  useEffect(() => async () => {
+    getInvoices();
+  }, [loaded]);
 
   return <>
     <InvoiceTable 
